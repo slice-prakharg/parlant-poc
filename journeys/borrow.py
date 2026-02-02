@@ -1,6 +1,7 @@
 import parlant.sdk as p
 from journey_conditions import borrow_observations, bank_linking_issues_observations
 from journeys.borrow_matchers import * # type: ignore
+from journeys.borrow_canned_responses import borrow_canned_responses
 
 # only checking this journey for now
 
@@ -58,7 +59,7 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
         matcher=match_application_needs_correction,
         condition="",
         description="this guideline is used to inform user that their borrow application needs correction",
-        action="Your application could not be processed and we’ve sent it back to you for review — please check and resubmit after making the updates. Going through the onboarding again can help fix the issue.",
+        canned_responses = [borrow_canned_responses.APPLICATION_NEEDS_CORRECTION_RESPONSE],
         composition_mode=p.CompositionMode.STRICT,
         on_match=on_guideline_match
     )
@@ -77,7 +78,7 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
         matcher=match_application_started,
         condition="",
         description="lets us know if user's application is still in the started state",
-        action="It looks like your borrow application isn't complete yet. Complete it soon so you can start enjoying slice borrow ",
+        canned_responses = [borrow_canned_responses.APPLICATION_STARTED_RESPONSE],
         composition_mode=p.CompositionMode.STRICT,
         on_match=on_guideline_match
 
@@ -94,17 +95,9 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
 
     guideline_kyc_pan_info = await application_issues_journey.create_guideline(
         condition="user mentions issue with PAN verification",
-        action=(
-            "You’re unable to borrow right now because your PAN verification is pending. This can happen for a few reasons:\n"
-            "• Your PAN might already be linked to another slice account — try logging in with the same mobile number.\n"
-            "• The PAN entered may have a small error — please double-check the 10-character format (e.g., ABCDE1234F).\n"
-            "• If you’ve recently received a new PAN, it may take up to 7 days to become active in the official database — please try again later.\n"
-            "• The PAN you entered might be different from the one linked to your slice Savings Account — please use the same PAN to keep things connected.\n\n"
-            "If you’re not facing any of these issues, please complete your application to start borrowing today. 🎉"
-        ),
-
-        composition_mode=p.CompositionMode.STRICT,
-        on_match=on_guideline_match
+        canned_responses = [borrow_canned_responses.PAN_VERIFICATION_ISSUE_RESPONSE],
+        on_match=on_guideline_match,
+        composition_mode=p.CompositionMode.STRICT
 
     )
 
@@ -122,7 +115,7 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
         matcher=match_application_submitted,
         condition="",
         description="inform if user's application has been submitted",
-        action="We've received your application! Our team is on it, and we're working to get you an update as quickly as possible. You can expect to hear from us within 48 hours- often even sooner 🎉",
+        canned_responses = [borrow_canned_responses.APPLICATION_SUBMITTED_RESPONSE],
         composition_mode=p.CompositionMode.STRICT,
         on_match=on_guideline_match
 
@@ -131,7 +124,7 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
     guideline_application_kycdone = await application_issues_journey.create_guideline(
         condition="",
         matcher=match_application_kycdone,
-        action="We've received your application! Our team is on it, and we're working to get you an update as quickly as possible. You can expect to hear from us within 48 hours- often even sooner 🎉",
+        canned_responses = [borrow_canned_responses.APPLICATION_KYCDONE_RESPONSE],
         composition_mode=p.CompositionMode.STRICT,
         on_match=on_guideline_match
     )
@@ -139,7 +132,7 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
     guideline_application_already_approved = await application_issues_journey.create_guideline(
         condition="",
         matcher=match_application_already_approved,
-        action="Your application has already been approved! 🎉. If you are facing any other issues with borrowing money, let us know in more detail so we can help you further",
+        canned_responses = [borrow_canned_responses.APPLICATION_ALREADY_APPROVED_RESPONSE],
         composition_mode=p.CompositionMode.STRICT,
         on_match=on_guideline_match
     )
