@@ -9,7 +9,17 @@ async def match_user_has_credit_card(
     profile_details_variable = await context.agent.find_variable(name="profile_data")
     assert profile_details_variable
 
-    details = await profile_details_variable.get_value_for_customer(context.customer)
+    try:
+        details = await profile_details_variable.get_value_for_customer(context.customer)
+        print(f"[{match_user_has_credit_card.__name__}] value for customer: {details}")
+    except Exception as e:
+        print(f"❌ Error getting value for customer in match_user_has_credit_card: {e}")
+        return p.GuidelineMatch(
+            id=guideline.id,
+            matched=False,
+            rationale=f"Error retrieving customer data: {str(e)}"
+        )
+    
     assert details
 
     print("=" * 20)
@@ -39,7 +49,17 @@ async def match_user_has_personal_loan(
     profile_details_variable = await context.agent.find_variable(name="profile_data")
     assert profile_details_variable
 
-    details = await profile_details_variable.get_value_for_customer(context.customer)
+    try:
+        details = await profile_details_variable.get_value_for_customer(context.customer)
+        print(f"[{match_user_has_personal_loan.__name__}] value for customer: {details}")
+    except Exception as e:
+        print(f"❌ Error getting value for customer in match_user_has_personal_loan: {e}")
+        return p.GuidelineMatch(
+            id=guideline.id,
+            matched=False,
+            rationale=f"Error retrieving customer data: {str(e)}"
+        )
+    
     assert details
 
     print("=" * 20)
@@ -67,7 +87,17 @@ async def match_borrow_application_declined(
     profile_details_variable = await context.agent.find_variable(name="profile_data")
     assert profile_details_variable
 
-    details = await profile_details_variable.get_value_for_customer(context.customer)
+    try:
+        details = await profile_details_variable.get_value_for_customer(context.customer)
+        print(f"[{match_borrow_application_declined.__name__}] value for customer: {details}")
+    except Exception as e:
+        print(f"❌ Error getting value for customer in match_borrow_application_declined: {e}")
+        return p.GuidelineMatch(
+            id=guideline.id,
+            matched=False,
+            rationale=f"Error retrieving customer data: {str(e)}"
+        )
+    
     assert details
 
     print("=" * 20)
@@ -95,7 +125,17 @@ async def match_user_has_not_started_borrow_application(
     profile_details_variable = await context.agent.find_variable(name="profile_data")
     assert profile_details_variable
 
-    details = await profile_details_variable.get_value_for_customer(context.customer)
+    try:
+        details = await profile_details_variable.get_value_for_customer(context.customer)
+        print(f"[{match_user_has_not_started_borrow_application.__name__}] value for customer: {details}")
+    except Exception as e:
+        print(f"❌ Error getting value for customer in match_user_has_not_started_borrow_application: {e}")
+        return p.GuidelineMatch(
+            id=guideline.id,
+            matched=False,
+            rationale=f"Error retrieving customer data: {str(e)}"
+        )
+    
     assert details
 
     print("=" * 20)
@@ -122,7 +162,17 @@ async def match_application_needs_correction(
     profile_details_variable = await context.agent.find_variable(name="profile_data")
     assert profile_details_variable
 
-    details = await profile_details_variable.get_value_for_customer(context.customer)
+    try:
+        details = await profile_details_variable.get_value_for_customer(context.customer)
+        print(f"[{match_application_needs_correction.__name__}] value for customer: {details}")
+    except Exception as e:
+        print(f"❌ Error getting value for customer in match_application_needs_correction: {e}")
+        return p.GuidelineMatch(
+            id=guideline.id,
+            matched=False,
+            rationale=f"Error retrieving customer data: {str(e)}"
+        )
+    
     assert details
 
     print("=" * 20)
@@ -150,7 +200,17 @@ async def match_application_started(
     profile_details_variable = await context.agent.find_variable(name="profile_data")
     assert profile_details_variable
 
-    details = await profile_details_variable.get_value_for_customer(context.customer)
+    try:
+        details = await profile_details_variable.get_value_for_customer(context.customer)
+        print(f"[{match_application_started.__name__}] value for customer: {details}")
+    except Exception as e:
+        print(f"❌ Error getting value for customer in match_application_started: {e}")
+        return p.GuidelineMatch(
+            id=guideline.id,
+            matched=False,
+            rationale=f"Error retrieving customer data: {str(e)}"
+        )
+    
     assert details
 
     print("=" * 20)
@@ -178,7 +238,17 @@ async def match_application_submitted(
     profile_details_variable = await context.agent.find_variable(name="profile_data")
     assert profile_details_variable
 
-    details = await profile_details_variable.get_value_for_customer(context.customer)
+    try:
+        details = await profile_details_variable.get_value_for_customer(context.customer)
+        print(f"[{match_application_submitted.__name__}] value for customer: {details}")
+    except Exception as e:
+        print(f"❌ Error getting value for customer in match_application_submitted: {e}")
+        return p.GuidelineMatch(
+            id=guideline.id,
+            matched=False,
+            rationale=f"Error retrieving customer data: {str(e)}"
+        )
+    
     assert details
 
     print("=" * 20)
@@ -206,7 +276,16 @@ async def match_application_kycdone(
     profile_details_variable = await context.agent.find_variable(name="profile_data")
     assert profile_details_variable
 
-    details = await profile_details_variable.get_value_for_customer(context.customer)
+    try:
+        details = await profile_details_variable.get_value_for_customer(context.customer)
+        print(f"[{match_application_kycdone.__name__}] value for customer: {details}")
+    except Exception as e:
+        print(f"❌ Error getting value for customer in match_application_kycdone: {e}")
+        return p.GuidelineMatch(
+            id=guideline.id,
+            matched=False,
+            rationale=f"Error retrieving customer data: {str(e)}"
+        )
 
     print("=" * 20)
     print(f"match_application_kycdone: {match_application_kycdone.__name__}")
@@ -232,7 +311,17 @@ async def match_application_already_approved(
     profile_details_variable = await context.agent.find_variable(name="profile_data")
     assert profile_details_variable
 
-    details = await profile_details_variable.get_value_for_customer(context.customer)
+    try:
+        details = await profile_details_variable.get_value_for_customer(context.customer)
+        print(f"[{match_application_already_approved.__name__}] value for customer: {details}")
+    except Exception as e:
+        print(f"❌ Error getting value for customer in match_application_already_approved: {e}")
+        return p.GuidelineMatch(
+            id=guideline.id,
+            matched=False,
+            rationale=f"Error retrieving customer data: {str(e)}"
+        )
+    
     assert details
 
     print("=" * 20)
@@ -260,7 +349,17 @@ async def match_purchase_power_locked(
     profile_details_variable = await context.agent.find_variable(name="profile_data")
     assert profile_details_variable
     
-    details = await profile_details_variable.get_value_for_customer(context.customer)   
+    try:
+        details = await profile_details_variable.get_value_for_customer(context.customer)
+        print(f"[{match_purchase_power_locked.__name__}] value for customer: {details}")
+    except Exception as e:
+        print(f"❌ Error getting value for customer in match_purchase_power_locked: {e}")
+        return p.GuidelineMatch(
+            id=guideline.id,
+            matched=False,
+            rationale=f"Error retrieving customer data: {str(e)}"
+        )
+       
     assert details
 
     print("=" * 20)
@@ -288,7 +387,17 @@ async def is_savings_account_onboarding_pending(
     profile_details_variable = await context.agent.find_variable(name="profile_data")
     assert profile_details_variable
 
-    details = await profile_details_variable.get_value_for_customer(context.customer)
+    try:
+        details = await profile_details_variable.get_value_for_customer(context.customer)
+        print(f"[{is_savings_account_onboarding_pending.__name__}] value for customer: {details}")
+    except Exception as e:
+        print(f"❌ Error getting value for customer in is_savings_account_onboarding_pending: {e}")
+        return p.GuidelineMatch(
+            id=guideline.id,
+            matched=False,
+            rationale=f"Error retrieving customer data: {str(e)}"
+        )
+    
     assert details
 
     print("=" * 20)

@@ -1,9 +1,10 @@
 import os
+import traceback
 import parlant.sdk as p
 from glossary import register_glossary_terms
 from variables import create_and_register_variables
 from journey_conditions.borrow import register_borrow_journey_selection_conditions
-from journeys import create_journey_issues_with_borrow_application
+from journeys import create_journey_issues_with_borrow_application, test_journey
 
 
 async def main():
@@ -30,6 +31,13 @@ async def main():
         print("Journey conditions registered")
 
         await create_journey_issues_with_borrow_application(agent)
+
+        try:
+            await test_journey(agent)
+        except Exception as e:
+            print(f"\n❌ Error in test_journey: {e}")
+            print("\nFull traceback:")
+            traceback.print_exc()
 
         # register glossary terms
         await register_glossary_terms(agent)

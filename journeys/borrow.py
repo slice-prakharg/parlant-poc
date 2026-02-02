@@ -3,6 +3,13 @@ from journey_conditions import borrow_observations, bank_linking_issues_observat
 from journeys.borrow_matchers import * # type: ignore
 
 # only checking this journey for now
+
+async def on_guideline_match(ctx: p.EngineContext, match: p.GuidelineMatch) -> None:
+    print(f"on_guideline_match: {match.id}, rationale: {match.rationale}, matched: {match.matched}")
+
+async def on_journey_state_match(ctx: p.EngineContext, match: p.JourneyStateMatch) -> None:
+    print(f"on_journey_state_match: {match.state_id}, {match.transition_id}, rationale: {match.rationale}, matched: {match.matched}")
+
 async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Journey:
     application_issues_journey: p.Journey = await agent.create_journey(
         title="borrow application issues",
@@ -17,32 +24,32 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
         matcher=match_user_has_credit_card,
         condition="",
         description="this guideline is used to disqualify user from borrow application issues query if they are currently using credit card product",
-        criticality=p.Criticality.HIGH,
-        action="Inform user that they are currently upgraded to slice Credit Card, therefore borrow application related should no longer be a concern for them. They can simply use their credit card for their money needs."
+        action="Inform user that they are currently upgraded to slice Credit Card, therefore borrow application related should no longer be a concern for them. They can simply use their credit card for their money needs.",
+        on_match=on_guideline_match
     )
 
     guideline_is_personal_loan_user = await application_issues_journey.create_guideline(
         matcher=match_user_has_personal_loan,
         condition="",
         description="this guideline is used to disqualify user from borrow application issues query if they are currently using personal loan product",
-        criticality=p.Criticality.HIGH,
-        action="Inform user that they are currently upgraded to slice Personal Loan, therefore borrow application related issues should no longer be a concern for them. Thank them for being a part of slice and encourage them to continue using slice products."
+        action="Inform user that they are currently upgraded to slice Personal Loan, therefore borrow application related issues should no longer be a concern for them. Thank them for being a part of slice and encourage them to continue using slice products.",
+        on_match=on_guideline_match
     )
 
     observation_is_savings_account_onboarding_pending = await application_issues_journey.create_guideline(
         matcher=is_savings_account_onboarding_pending,
         condition="",
         description="informs whether user's savings account onboarding is still not completed",
-        criticality=p.Criticality.LOW,
-        action="Inform user's that they can explore our digital savings account and explain the benefits of it like high interest rate, easy to use, etc"
+        action="Inform user's that they can explore our digital savings account and explain the benefits of it like high interest rate, easy to use, etc",
+        on_match=on_guideline_match
     )
 
     guideline_is_application_declined = await application_issues_journey.create_guideline(
         matcher=match_borrow_application_declined,
         condition="",
         description="this guideline is used to disqualify user from borrow application issues query if their borrow application has been declined",
-        criticality=p.Criticality.HIGH,
-        action="Inform user that we cannot provide them borrow at the moment just yet but our evaluation criteria updates regularly, therefore they can check back later"
+        action="Inform user that we cannot provide them borrow at the moment just yet but our evaluation criteria updates regularly, therefore they can check back later",
+        on_match=on_guideline_match
     )
 
     await guideline_is_application_declined.entail(observation_is_savings_account_onboarding_pending)
@@ -51,15 +58,16 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
         matcher=match_application_needs_correction,
         condition="",
         description="this guideline is used to inform user that their borrow application needs correction",
-        criticality=p.Criticality.HIGH,
         action="Your application could not be processed and we’ve sent it back to you for review — please check and resubmit after making the updates. Going through the onboarding again can help fix the issue.",
-        composition_mode=p.CompositionMode.STRICT
+        composition_mode=p.CompositionMode.STRICT,
+        on_match=on_guideline_match
     )
 
     guideline_user_frutrated_app_needs_correction = await application_issues_journey.create_guideline(
         condition="user shows frustration and mentions they have tried all steps multiple times but application is still not getting approved",
         action="Apologize to user and inform them that you will transfer their query to our dedicated support team who will help them with their application issue",
-        composition_mode=p.CompositionMode.FLUID
+        composition_mode=p.CompositionMode.FLUID,
+        on_match=on_guideline_match
     )
 
     await guideline_user_frutrated_app_needs_correction.depend_on(guideline_application_needs_correction)
@@ -70,14 +78,16 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
         condition="",
         description="lets us know if user's application is still in the started state",
         action="It looks like your borrow application isn't complete yet. Complete it soon so you can start enjoying slice borrow ",
-        composition_mode=p.CompositionMode.STRICT
+        composition_mode=p.CompositionMode.STRICT,
+        on_match=on_guideline_match
 
     )
 
     guideline_user_asks_why_unable_to_complete_application = await application_issues_journey.create_guideline(
         condition="user asks why they are unable to complete their application",
         action="Apologize to user and inform them that you will transfer their query to our dedicated support team who will help them with their application issue",
-        composition_mode=p.CompositionMode.FLUID
+        composition_mode=p.CompositionMode.FLUID,
+        on_match=on_guideline_match
     )
 
     await guideline_user_asks_why_unable_to_complete_application.depend_on(guideline_application_started)
@@ -93,14 +103,16 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
             "If you’re not facing any of these issues, please complete your application to start borrowing today. 🎉"
         ),
 
-        composition_mode=p.CompositionMode.STRICT
+        composition_mode=p.CompositionMode.STRICT,
+        on_match=on_guideline_match
 
     )
 
     guideline_kyc_adhar_info = await application_issues_journey.create_guideline(
         condition="user mentions issue with Aadhar verification",
         action="Apologize to user and inform them that you will transfer their query to our dedicated support team who will help them with their Aadhar verification issue",
-        composition_mode=p.CompositionMode.FLUID
+        composition_mode=p.CompositionMode.FLUID,
+        on_match=on_guideline_match
     )
 
     await guideline_kyc_pan_info.depend_on(borrow_observations.APPLICATION_STUCK_KYC_PAN)
@@ -110,9 +122,9 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
         matcher=match_application_submitted,
         condition="",
         description="inform if user's application has been submitted",
-        criticality=p.Criticality.HIGH,
         action="We've received your application! Our team is on it, and we're working to get you an update as quickly as possible. You can expect to hear from us within 48 hours- often even sooner 🎉",
-        composition_mode=p.CompositionMode.STRICT
+        composition_mode=p.CompositionMode.STRICT,
+        on_match=on_guideline_match
 
     )
 
@@ -120,14 +132,16 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
         condition="",
         matcher=match_application_kycdone,
         action="We've received your application! Our team is on it, and we're working to get you an update as quickly as possible. You can expect to hear from us within 48 hours- often even sooner 🎉",
-        composition_mode=p.CompositionMode.STRICT
+        composition_mode=p.CompositionMode.STRICT,
+        on_match=on_guideline_match
     )
 
     guideline_application_already_approved = await application_issues_journey.create_guideline(
         condition="",
         matcher=match_application_already_approved,
         action="Your application has already been approved! 🎉. If you are facing any other issues with borrowing money, let us know in more detail so we can help you further",
-        composition_mode=p.CompositionMode.STRICT
+        composition_mode=p.CompositionMode.STRICT,
+        on_match=on_guideline_match
     )
     
 
@@ -186,6 +200,46 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
 #     return bank_linking_issues_journey
 
 
+@p.tool
+async def call_test_tool(context: p.ToolContext) -> p.ToolResult:
+    return p.ToolResult(
+        data={
+            "weather": "sunny"
+        }
+    )
+
+
+async def test_journey(agent: p.Agent) -> p.Journey:
+    test_journey: p.Journey = await agent.create_journey(
+        title="test journey",
+        description="journey to test the journey creation and execution.",
+        conditions=[
+            "user wants to know about the weather"
+        ]
+    )
+    t1 = await test_journey.initial_state.transition_to(
+        tool_state=call_test_tool,
+        tool_instruction="gets the weather of the user's location",
+
+    )
+
+    fork =  await t1.target.fork()
+
+    f1 = await fork.target.transition_to(
+        condition="weather is sunny",
+        chat_state="inform the user that the weather is sunny",
+        on_match=on_journey_state_match
+    )
+
+    f2 = await fork.target.transition_to(
+        condition="weather is cloudy",
+        chat_state="inform the user that the weather is cloudy",
+        on_match=on_journey_state_match
+    )
+    
+
+    return test_journey
+
 # async def create_journey_purchase_power_issues(agent: p.Agent) -> p.Journey:
     purchase_power_issues_journey: p.Journey = await agent.create_journey(
         title="purchase power issues",
@@ -202,7 +256,6 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
         matcher=match_user_has_credit_card,
         condition="",
         description="this guideline is used to disqualify user from purchase power issues query if they are currently using credit card product",
-        criticality=p.Criticality.HIGH,
         action="Inform user that they are currently upgraded to slice Credit Card, therefore purchase power is not applicable to them. They can simply use their credit card for their money needs.",
         composition_mode=p.CompositionMode.FLUID
     )
