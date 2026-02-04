@@ -4,7 +4,8 @@ import parlant.sdk as p
 from glossary import register_glossary_terms
 from variables import create_and_register_variables
 from journey_conditions.borrow import register_borrow_journey_selection_conditions
-from journeys import create_journey_issues_with_borrow_application, test_journey, register_borrow_canned_responses
+from journey_conditions.bank_linking_issues import register_bank_linking_issues_journey_selection_conditions
+from journeys import create_journey_issues_with_borrow_application, register_borrow_canned_responses, create_journey_bank_linking_issues
 
 
 async def main():
@@ -37,6 +38,7 @@ async def main():
 
         # register journey selection guideline conditions
         await register_borrow_journey_selection_conditions(agent)
+        await register_bank_linking_issues_journey_selection_conditions(agent)
         print("Journey conditions registered")
 
         try:
@@ -47,11 +49,11 @@ async def main():
             print("\nFull traceback:")
             traceback.print_exc()
 
-
         try:
-            await test_journey(agent)
+            await create_journey_bank_linking_issues(agent)
+            print("Journey bank linking issues created and registered")
         except Exception as e:
-            print(f"\n❌ Error in test_journey: {e}")
+            print(f"\n❌ Error in create_journey_bank_linking_issues: {e}")
             print("\nFull traceback:")
             traceback.print_exc()
 

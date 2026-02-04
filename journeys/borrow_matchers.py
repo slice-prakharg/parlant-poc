@@ -117,6 +117,19 @@ async def match_borrow_application_declined(
     )
 
 
+async def custom_matcher(
+    context: p.GuidelineMatchingContext, 
+    guideline: p.Guideline
+) -> p.GuidelineMatch:
+    """Custom matcher for name mismatch error."""
+    return p.GuidelineMatch(
+        id=guideline.id,
+        matched=True,
+        rationale="User is not facing name mismatch error"
+    )
+
+
+
 async def match_user_has_not_started_borrow_application(
     context: p.GuidelineMatchingContext, 
     guideline: p.Guideline

@@ -66,8 +66,8 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
 
     guideline_user_frutrated_app_needs_correction = await application_issues_journey.create_guideline(
         condition="user shows frustration and mentions they have tried all steps multiple times but application is still not getting approved",
-        action="Apologize to user and inform them that you will transfer their query to our dedicated support team who will help them with their application issue",
-        composition_mode=p.CompositionMode.FLUID,
+        canned_responses = [borrow_canned_responses.CONNECT_TO_AGENT_RESPONSE],
+        composition_mode=p.CompositionMode.STRICT,
         on_match=on_guideline_match
     )
 
@@ -86,8 +86,8 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
 
     guideline_user_asks_why_unable_to_complete_application = await application_issues_journey.create_guideline(
         condition="user asks why they are unable to complete their application",
-        action="Apologize to user and inform them that you will transfer their query to our dedicated support team who will help them with their application issue",
-        composition_mode=p.CompositionMode.FLUID,
+        canned_responses = [borrow_canned_responses.CONNECT_TO_AGENT_RESPONSE],
+        composition_mode=p.CompositionMode.STRICT,
         on_match=on_guideline_match
     )
 
@@ -103,8 +103,8 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
 
     guideline_kyc_adhar_info = await application_issues_journey.create_guideline(
         condition="user mentions issue with Aadhar verification",
-        action="Apologize to user and inform them that you will transfer their query to our dedicated support team who will help them with their Aadhar verification issue",
-        composition_mode=p.CompositionMode.FLUID,
+        canned_responses = [borrow_canned_responses.CONNECT_TO_AGENT_RESPONSE],
+        composition_mode=p.CompositionMode.STRICT,
         on_match=on_guideline_match
     )
 
@@ -160,41 +160,42 @@ async def create_journey_issues_with_borrow_application(agent: p.Agent) -> p.Jou
 
     return application_issues_journey
 
-# async def create_journey_bank_linking_issues(agent: p.Agent) -> p.Journey:
-#     bank_linking_issues_journey: p.Journey = await agent.create_journey(
-#         title="bank linking issues",
-#         description="journey to handle user's issues with their bank linking.",
-#         conditions=[
-#             bank_linking_issues_observations.BANK_LINKING_ISSUES_GENERAL,
-#         ]
-#     )
+async def create_journey_bank_linking_issues(agent: p.Agent) -> p.Journey:
+    bank_linking_issues_journey: p.Journey = await agent.create_journey(
+        title="bank linking issues",
+        description="journey to handle user's issues with their bank linking.",
+        conditions=[
+            bank_linking_issues_observations.BANK_LINKING_ISSUES_GENERAL,
+        ]
+    )
 
-#     penny_drop_failure = await bank_linking_issues_journey.create_guideline(
-#         condition="user says explicitly they are facing penny drop failure",
-#         action=(
-#             "It looks like the ₹1 penny drop transaction didn't go through. This can happen due to a couple of reasons:\n\n"
-#             "• Insufficient balance — Please ensure there's enough balance in your account to complete the transaction.\n"
-#             "• Transaction declined by bank — Sometimes banks temporarily decline these small verification transactions, which can resolve itself.\n\n"
-#             "Here's what you can do:\n"
-#             "• Check your account balance and add funds if needed\n"
-#             "• Try the penny drop verification again after some time\n"
+    penny_drop_failure = await bank_linking_issues_journey.create_guideline(
+        condition="user says explicitly they are facing penny drop failure",
+        action=(
+            "It looks like the ₹1 penny drop transaction didn't go through. This can happen due to a couple of reasons:\n\n"
+            "• Insufficient balance — Please ensure there's enough balance in your account to complete the transaction.\n"
+            "• Transaction declined by bank — Sometimes banks temporarily decline these small verification transactions, which can resolve itself.\n\n"
+            "Here's what you can do:\n"
+            "• Check your account balance and add funds if needed\n"
+            "• Try the penny drop verification again after some time\n"
 
-#             "If you continue to experience issues, feel free to reach out—we're here to help!"
-#         ),
-#         composition_mode=p.CompositionMode.STRICT
-#     )
+            "If you continue to experience issues, feel free to reach out—we're here to help!"
+        ),
+        composition_mode=p.CompositionMode.STRICT
+    )
 
-#     name_mismatch_error = await bank_linking_issues_journey.create_guideline(
-#         condition="user says explicitly they are facing name mismatch error ",
-#         action="Apologize to user and inform them that you will transfer their query to our dedicated support team who will help them with their name mismatch error issue",
-#         composition_mode=p.CompositionMode.FLUID
-#     )
+    name_mismatch_error = await bank_linking_issues_journey.create_guideline(
+        condition="user says explicitly they are facing 'name mismatch error' in linking their bank account",
+        matcher=custom_matcher,
+        canned_responses = [borrow_canned_responses.CONNECT_TO_AGENT_RESPONSE],
+        composition_mode=p.CompositionMode.STRICT
+    )
 
-#     return bank_linking_issues_journey
+    return bank_linking_issues_journey
 
 
-@p.tool
-async def call_test_tool(context: p.ToolContext) -> p.ToolResult:
+# @p.tool
+# async def call_test_tool(context: p.ToolContext) -> p.ToolResult:
     return p.ToolResult(
         data={
             "weather": "sunny"
@@ -202,7 +203,7 @@ async def call_test_tool(context: p.ToolContext) -> p.ToolResult:
     )
 
 
-async def test_journey(agent: p.Agent) -> p.Journey:
+# async def test_journey(agent: p.Agent) -> p.Journey:
     test_journey: p.Journey = await agent.create_journey(
         title="test journey",
         description="journey to test the journey creation and execution.",
@@ -233,7 +234,8 @@ async def test_journey(agent: p.Agent) -> p.Journey:
 
     return test_journey
 
-# async def create_journey_purchase_power_issues(agent: p.Agent) -> p.Journey:
+
+async def create_journey_purchase_power_issues(agent: p.Agent) -> p.Journey:
     purchase_power_issues_journey: p.Journey = await agent.create_journey(
         title="purchase power issues",
         description="journey to handle user's issues with their purchase power.",
@@ -278,23 +280,22 @@ async def test_journey(agent: p.Agent) -> p.Journey:
     )
     await know_my_pp.depends_on(borrow_observations.KNOW_MY_PURCHASE_POWER)
 
-    why_low_pp = await purchase_power_issues_journey.create_guideline(
-        condition="user wants to know why their purchase power is low",
-        description="this guideline is used to inform user about the reasons why their purchase power is low",
-        action="purchase power is internally decided based on risk assessment and is re evaluated after every repayment, therefore if there is any outstanding balance in 'profile_details', then the same should be cleared",
+    observersation_why_low_pp = await purchase_power_issues_journey.create_observation(
+        condition="user wants to know why his purchase power is low"
+    )
+
+    guideline_low_pp_has_outstanding_balance = await purchase_power_issues_journey.create_guideline(
+        matcher=match_low_pp_has_outstanding_balance,
+        condition="",
+        description="gives information to user's query about his low purchase power when there is an outstanding balance",
+        action="inform the user that their purchase power is low because they have an outstanding balance",
         composition_mode=p.CompositionMode.FLUID
     )
-
-    observation_pp_locked = await purchase_power_issues_journey.create_guideline(
-        matcher=match_purchase_power_locked,
-    )
-
-
-    await why_low_pp.depends_on(borrow_observations.WHY_LOW_PP)
 
     await is_cc_user.prioritize_over(declined_user)
     await is_personal_loan_user.prioritize_over(declined_user)
     await is_cc_user.prioritize_over(know_my_pp)
     await is_personal_loan_user.prioritize_over(know_my_pp)
+    await declined_user.prioritize_over(know_my_pp)
 
     return purchase_power_issues_journey
